@@ -1,9 +1,283 @@
-:root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+
+@layer theme {
+  @theme {
+
+    /* Wipe Tailwind's default palette. Only Aepsy colors exist. */
+    --color-*: initial;
+    --color-transparent: transparent;
+
+    --color-primary-100: #f5fbf4;
+    --color-primary-200: #edf5eb;
+    --color-primary-300: #c9dacc;
+    --color-primary-400: #91a693;
+    --color-primary-500: #516253;
+    --color-primary-600: #2e382f;
+    /* Nook extension: primary-600 × 0.85. Lifts peach-500 to 4.89:1 (AA) from
+       4.37 (AA-large). See DESIGN.md `### Token mở rộng`. */
+    --color-primary-700: #273028;
+
+    --color-rose-100: #fff7f7;
+    --color-rose-200: #f7eeed;
+    --color-rose-300: #eac5c3;
+    --color-rose-400: #da918b;
+    --color-rose-500: #be6b65;
+    --color-rose-600: #853d38;
+
+    --color-beige-100: #fefcf6;
+    --color-beige-200: #f6f3ea;
+    --color-beige-300: #f0decb;
+    --color-beige-400: #c4a57e;
+    --color-beige-500: #96714f;
+    --color-beige-600: #543f2c;
+
+    --color-blue-100: #f5fbfe;
+    --color-blue-200: #f1f6f9;
+    --color-blue-300: #cedde3;
+    --color-blue-400: #587684;
+    --color-blue-500: #223d49;
+    --color-blue-600: #182c34;
+
+    --color-purple-100: #fbfaff;
+    --color-purple-200: #f3f1fa;
+    --color-purple-300: #d2cce5;
+    --color-purple-400: #aa9dcd;
+    --color-purple-500: #8467d7;
+    --color-purple-600: #412f74;
+
+    --color-peach-100: #f9e7d7;
+    --color-peach-200: #edccae;
+    --color-peach-300: #f4ca9a;
+    --color-peach-400: #edac94;
+    --color-peach-500: #f0766f;
+    --color-peach-600: #e77972;
+
+    --color-green-100: #b9d2a8;
+    --color-green-200: #8ee6b4;
+    --color-green-300: #56cd89;
+    --color-green-400: #27ae60;
+    --color-green-500: #1e854a;
+    --color-green-600: #145d32;
+
+    --color-red-100: #fff7f7;
+    --color-red-200: #fbc8bd;
+    --color-red-300: #f46957;
+    --color-red-400: #f13f28;
+    --color-red-500: #d7250e;
+    --color-red-600: #7c1508;
+
+    --color-yellow-100: #fff7eb;
+    --color-yellow-200: #fcebcf;
+    --color-yellow-300: #f2c988;
+    --color-yellow-400: #ecae52;
+    --color-yellow-500: #d38b17;
+    --color-yellow-600: #774f0d;
+
+    --color-white: #ffffff;
+    --color-black: #212121;
+
+    --color-grey-100: #fefdfc;
+    --color-grey-200: #f2f2f2;
+    --color-grey-300: #dedede;
+    --color-grey-400: #adadad;
+    --color-grey-500: #464646;
+    --color-grey-600: var(--color-black);
+
+    --color-deep: var(--color-primary-700);
+    --color-canvas: var(--color-primary-200);
+    --color-canvas-strong: var(--color-primary-300);
+    --color-surface: var(--color-white);
+    --color-sunken: var(--color-grey-200);
+    --color-selected: var(--color-primary-200);
+    --color-scrim: rgba(39, 48, 40, 0.55);
+
+    --color-ink: var(--color-primary-500); /* 6.52:1 on white */
+    --color-ink-soft: #6b7a6d; /* primary-500 @ 85% — 4.54:1, lowest step still AA */
+    --color-ink-strong: var(--color-primary-600); /* 12.19:1 — required on sage */
+    --color-ink-faint: var(--color-primary-400); /* 2.60:1 — placeholder/disabled ONLY */
+
+    --color-on-deep: var(--color-primary-100); /* 12.98:1 */
+    --color-on-deep-muted: var(--color-primary-300); /* 9.34:1 */
+    --color-on-deep-faint: var(--color-primary-400); /* 5.25:1 */
+
+    --color-hairline: var(--color-grey-200); /* exact match for provider-item.png */
+    --color-line: var(--color-grey-300);
+    --color-focus: var(--color-primary-500);
+    --color-on-deep-veil: rgba(145, 166, 147, 0.3);
+
+    --color-brand: var(--color-primary-600);
+    --color-on-brand: var(--color-white); /* 12.19:1 on brand */
+    --color-brand-muted: var(--color-primary-200);
+
+       selection dots. Never a text color. See DESIGN.md `### Quy tắc coral`. */
+    --color-coral: var(--color-peach-500);
+    --color-coral-mid: var(--color-peach-400);
+    --color-coral-soft: var(--color-peach-300);
+
+    --color-success: var(--color-green-500);
+    --color-success-fill: var(--color-green-400);
+    --color-info: var(--color-blue-500);
+    --color-caution: var(--color-yellow-600);
+    --color-caution-fill: var(--color-yellow-400);
+    --color-danger: var(--color-red-500); /* system errors / destructive actions */
+    --color-gentle: var(--color-rose-600); /* emotional path — 7.72:1 */
+    --color-gentle-fill: var(--color-rose-300);
+
+       Plus Jakarta Sans stand in, loaded via expo-font in `src/app/_layout`.
+       These names must match the loaded family names EXACTLY. */
+    --font-serif: 'Newsreader_400Regular';
+    --font-sans: 'PlusJakartaSans_400Regular';
+    --font-sans-medium: 'PlusJakartaSans_500Medium';
+    --font-sans-semibold: 'PlusJakartaSans_600SemiBold';
+
+       Serif is the human voice (display/title), sans is the interface. */
+    --text-display: 32px;
+    --text-display--line-height: 38px;
+    --text-display--letter-spacing: -0.5px;
+
+    --text-title: 24px;
+    --text-title--line-height: 30px;
+    --text-title--letter-spacing: -0.3px;
+
+    --text-heading: 20px;
+    --text-heading--line-height: 26px;
+    --text-heading--letter-spacing: -0.2px;
+
+    --text-body: 16px;
+    --text-body--line-height: 24px;
+
+    --text-callout: 15px;
+    --text-callout--line-height: 22px;
+
+    --text-label: 14px;
+    --text-label--line-height: 20px;
+
+    --text-caption: 13px;
+    --text-caption--line-height: 18px;
+
+    --text-overline: 11px;
+    --text-overline--line-height: 14px;
+    --text-overline--letter-spacing: 0.6px;
+
+    /* Anchored in px, NOT the `0.25rem` default. react-native-css resolves
+       `rem` to 14 on native (RN's default font size) and 16 on web, so `p-4`
+       would be 14pt on device and 16px on web — the 4pt scale off by 12.5% and
+       the platforms out of sync. Measured: an `h-10` chip came out 35pt, which
+       misses the 44 touch target even with hitSlop 2. */
+    --spacing: 4px;
+
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 12px; /* provider card — measured off the mockup: 0.024 × width */
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    /* M3 extended FAB. Must be explicit: Tailwind defaults to `1rem`, and rem
+       is 14 on native, so it would come out 14 instead of 16. */
+    --radius-2xl: 16px;
+
+    --shadow-xs: 2px 3px 3px rgba(0, 0, 0, 0.03);
+    --shadow-sm: 2px 4px 18px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0px 3px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0px 7px 18px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0px 10px 24px rgba(0, 0, 0, 0.1);
+
+    --duration-instant: 120ms;
+    --duration-fast: 180ms;
+    --duration-base: 240ms;
+    --duration-slow: 320ms;
+    --duration-breath: 2400ms;
+  }
+}
+
+@utility type-display {
+  font-family: var(--font-serif);
+  font-size: var(--text-display);
+  line-height: var(--text-display--line-height);
+  letter-spacing: var(--text-display--letter-spacing);
+}
+
+@utility type-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-title);
+  line-height: var(--text-title--line-height);
+  letter-spacing: var(--text-title--letter-spacing);
+}
+
+@utility type-heading {
+  font-family: var(--font-sans-semibold);
+  font-size: var(--text-heading);
+  line-height: var(--text-heading--line-height);
+  letter-spacing: var(--text-heading--letter-spacing);
+}
+
+@utility type-body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+
+@utility type-body-strong {
+  font-family: var(--font-sans-semibold);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+
+@utility type-callout {
+  font-family: var(--font-sans);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+}
+
+   named this step, and that gap is why two buttons once hand-paired
+   `font-sans-semibold text-callout` and lost their text. */
+@utility type-callout-strong {
+  font-family: var(--font-sans-semibold);
+  font-size: var(--text-callout);
+  line-height: var(--text-callout--line-height);
+}
+
+@utility type-label {
+  font-family: var(--font-sans-medium);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+}
+
+@utility type-caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  line-height: var(--text-caption--line-height);
+}
+
+@utility type-overline {
+  font-family: var(--font-sans-semibold);
+  font-size: var(--text-overline);
+  line-height: var(--text-overline--line-height);
+  letter-spacing: var(--text-overline--letter-spacing);
+}
+
+@utility size-touch {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@utility size-avatar {
+  width: 56px;
+  height: 56px;
+}
+
+@utility size-record {
+  width: 88px;
+  height: 88px;
+}
+
+@utility press {
+  transition-property: transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+
+  &:active {
+    transform: scale(0.97);
+  }
 }

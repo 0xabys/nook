@@ -1,0 +1,12 @@
+node_modules
+.expo
+dist
+android
+ios
+bun.lock
+package-lock.json
+assets
+
+# sinh tự động
+expo-env.d.ts
+nativewind-env.d.ts

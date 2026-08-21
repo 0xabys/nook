@@ -1,56 +1,59 @@
-# Welcome to your Expo app 👋
+# Nook
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Find a therapist by saying what's wrong — record a voice note, pick the topics it
+plays back, get practitioners taking clients.
 
-## Get started
+Expo SDK 57 · React 19 · React Native 0.86 · iOS + Android from one codebase.
 
-1. Install dependencies
+## Screenshots
 
-   ```bash
-   npm install
-   ```
+**iOS** — iPhone 17 Pro, iOS 26
 
-2. Start the app
+|                            Record                            |                            Recording                            |                            Choose                            |                            Results                            |
+| :----------------------------------------------------------: | :-------------------------------------------------------------: | :----------------------------------------------------------: | :-----------------------------------------------------------: |
+| <img src="assets/screenshots/ios-01-record.png" width="190"> | <img src="assets/screenshots/ios-02-recording.png" width="190"> | <img src="assets/screenshots/ios-03-choose.png" width="190"> | <img src="assets/screenshots/ios-04-results.png" width="190"> |
 
-   ```bash
-   npx expo start
-   ```
+**Android** — Pixel 7 Pro, API 35
 
-In the output, you'll find options to open the app in a
+|                              Record                              |                              Recording                              |                              Choose                              |                              Results                              |
+| :--------------------------------------------------------------: | :-----------------------------------------------------------------: | :--------------------------------------------------------------: | :---------------------------------------------------------------: |
+| <img src="assets/screenshots/android-01-record.png" width="190"> | <img src="assets/screenshots/android-02-recording.png" width="190"> | <img src="assets/screenshots/android-03-choose.png" width="190"> | <img src="assets/screenshots/android-04-results.png" width="190"> |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Getting started
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+**Prerequisites** — Node 20+, [Bun](https://bun.sh) 1.3+, Xcode 26 (iOS) or
+Android Studio with JDK 17 and an API 34+ emulator.
 
-## Get a fresh project
-
-When you're ready, run:
+This is a **development build**, not Expo Go — the app uses Skia,
+`expo-glass-effect` and `@expo/ui`, none of which exist in the Go sandbox.
 
 ```bash
-npm run reset-project
+bun install
+cp .env.example .env   # optional — falls back to the dev API when absent
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### iOS
 
-### Other setup steps
+```bash
+bun run ios                          # booted simulator
+bun run ios --device "iPhone 17 Pro" # or pick one
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### Android
 
-## Learn more
+```bash
+bun run android
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+`ios/` and `android/` are not committed — the first run generates them via
+prebuild, which takes a few minutes. Later builds are incremental.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Scripts
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+|                     |                                                   |
+| ------------------- | ------------------------------------------------- |
+| `bun run start`     | Metro only, when the app is already installed     |
+| `bun run test`      | 46 unit tests (`bun run test:watch` to watch)     |
+| `bun run typecheck` | `tsc --noEmit`                                    |
+| `bun run lint`      | ESLint + Prettier (`bun run lint:fix` to fix)     |
+| `bun run format`    | Prettier write (`bun run format:check` to verify) |
