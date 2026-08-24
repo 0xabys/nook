@@ -166,3 +166,42 @@ export function filterGroups(groups: DisorderGroup[], query: string): DisorderGr
 export function countItems(groups: DisorderGroup[]): number {
   return groups.reduce((total, group) => total + group.items.length, 0);
 }
+
+/**
+ * Per-group selection signature, one string per group, in `groups` order.
+ *
+ * A `Set` is a fresh object after every tap, so handing it to each group
+ * re-renders all 49 chips for a change that touched one. Strings compare by
+ * value, so groups whose selection did not move keep their memoised JSX; the
+ * cost is a single pass over the options.
+ */
+export function selectionKeys(
+  groups: readonly DisorderGroup[],
+  selected: ReadonlySet<string>,
+): string[] {
+  return groups.map((group) =>
+    group.items
+      .filter((item) => selected.has(item.value))
+      .map((item) => item.value)
+      .join(','),
+  );
+}
+
+/**
+ * Resolves ids back to the labels the user actually tapped, in id order.
+ *
+ * Never derive a label from the id: `U_DIS_DEPRESSION` is shown as "Feeling
+ * down", and echoing "Depression" puts a word on screen that reads like a
+ * diagnosis and that nobody chose. Unknown ids drop out instead.
+ */
+export function labelsFor(
+  options: readonly DisorderOption[] | null | undefined,
+  ids: readonly string[],
+): string[] {
+  if (!options || options.length === 0) return [];
+
+  const labelOf = new Map(options.map((option) => [option.value, option.label]));
+  return ids
+    .map((id) => labelOf.get(id))
+    .filter((label): label is string => typeof label === 'string' && label.length > 0);
+}
