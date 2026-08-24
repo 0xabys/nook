@@ -1,8 +1,8 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, it, test } from 'bun:test';
 
 import type { DisorderOption } from '@/hooks/use-audio-transcriber';
 
-import { countItems, filterGroups, groupDisorders } from './disorders';
+import { countItems, filterGroups, groupDisorders, labelsFor, selectionKeys } from './disorders';
 
 const ALL: DisorderOption[] = [
   { value: 'U_DIS_DEPRESSION', label: 'Feeling down' },
@@ -166,5 +166,59 @@ describe('filterGroups', () => {
   test('does not mutate the input', () => {
     filterGroups(groups, 'stress');
     expect(countItems(groups)).toBe(49);
+  });
+});
+
+describe('selectionKeys', () => {
+  const groups = groupDisorders([
+    { value: 'U_DIS_DEPRESSION', label: 'Feeling down' },
+    { value: 'U_DIS_STRESS', label: 'Stress' },
+    { value: 'U_DIS_PANIC', label: 'Sudden panic' },
+  ]);
+
+  it('returns one signature per group, in group order', () => {
+    expect(selectionKeys(groups, new Set())).toEqual(groups.map(() => ''));
+  });
+
+  it('lists only the values selected inside each group', () => {
+    const keys = selectionKeys(groups, new Set(['U_DIS_STRESS', 'U_DIS_PANIC']));
+    const mood = groups.findIndex((g) => g.id === 'mood');
+    const fear = groups.findIndex((g) => g.id === 'fear');
+    expect(keys[mood]).toBe('U_DIS_STRESS');
+    expect(keys[fear]).toBe('U_DIS_PANIC');
+  });
+
+  it('is stable when an unrelated group changes', () => {
+    const before = selectionKeys(groups, new Set(['U_DIS_STRESS']));
+    const after = selectionKeys(groups, new Set(['U_DIS_STRESS', 'U_DIS_PANIC']));
+    const mood = groups.findIndex((g) => g.id === 'mood');
+    expect(after[mood]).toBe(before[mood]);
+  });
+
+  it('ignores ids that are not on screen', () => {
+    expect(selectionKeys(groups, new Set(['U_DIS_NOT_HERE']))).toEqual(groups.map(() => ''));
+  });
+});
+
+describe('labelsFor', () => {
+  const options = [
+    { value: 'U_DIS_DEPRESSION', label: 'Feeling down' },
+    { value: 'U_DIS_STRESS', label: 'Stress, burnout' },
+  ];
+
+  it('resolves ids to the labels the user saw, in id order', () => {
+    expect(labelsFor(options, ['U_DIS_STRESS', 'U_DIS_DEPRESSION'])).toEqual([
+      'Stress, burnout',
+      'Feeling down',
+    ]);
+  });
+
+  it('drops ids with no label rather than inventing one', () => {
+    expect(labelsFor(options, ['U_DIS_STRESS', 'U_DIS_UNKNOWN'])).toEqual(['Stress, burnout']);
+  });
+
+  it('returns nothing when the options have not arrived', () => {
+    expect(labelsFor(null, ['U_DIS_STRESS'])).toEqual([]);
+    expect(labelsFor([], ['U_DIS_STRESS'])).toEqual([]);
   });
 });

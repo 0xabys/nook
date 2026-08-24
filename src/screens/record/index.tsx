@@ -3,10 +3,10 @@ import { useEffect, useRef } from 'react';
 import { Linking } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 
-import { useRecorder } from '@/hooks/use-recorder';
-import { formatDuration } from '@/utils/duration';
+import { useRecorder, type RecorderPhase } from '@/hooks/use-recorder';
 import { Colors } from '@/theme';
 import { Pressable, SafeAreaView, Text, View } from '@/tw';
+import { formatDuration } from '@/utils/duration';
 
 import { RecordButton } from './components/record-button';
 
@@ -15,19 +15,38 @@ const RECOVER = 'press mb-8 self-center rounded-full border border-on-deep-veil 
 /**
  * How long to wait after `router.push` before dropping the recorder back to
  * `idle`. The button draws a STOP square while the phase is not `idle`, so
- * resetting early flips the icon back to a mic WHILE the record screen is still
+ * resetting early flips the icon back to a mic while the record screen is still
  * fully visible.
  *
- * Navigation events do not work here: `blur` fires when `router.push` starts,
- * before the native transition moves at all, and `focus` fires after it has
- * finished. Neither lands while the screen is covered.
- *
- * 900 is measured. Push → the new screen starting to slide is 122–148ms on iOS
- * and 169–344ms on Android; plus the transition itself (~350ms / ~300ms) the
- * screen is fully covered around 500ms and 650ms. Erring late is harmless —
- * nobody sees it — while erring early is the actual bug.
+ * Navigation events do not help: `blur` fires when `router.push` starts, before
+ * the native transition moves at all, and `focus` fires after it has finished.
+ * Neither lands while the screen is covered. Erring late is invisible; erring
+ * early is the actual bug.
  */
 const SETTLE_MS = 900;
+
+const HINTS: Record<RecorderPhase, string> = {
+  idle: 'Tap to start',
+  recording: 'Tap to stop',
+  processing: 'Listening back…',
+  denied: 'Nook needs the microphone to hear you',
+  tooShort: 'That was very short. Say a little more?',
+  failed: 'Something got in the way of the microphone',
+};
+
+type Recovery = { label: string; onPress: () => void };
+
+function recoveryFor(phase: RecorderPhase, reset: () => void): Recovery | null {
+  switch (phase) {
+    case 'denied':
+      return { label: 'Open Settings', onPress: () => Linking.openSettings() };
+    case 'tooShort':
+    case 'failed':
+      return { label: 'Try again', onPress: reset };
+    default:
+      return null;
+  }
+}
 
 export function RecordScreen() {
   const { phase, level, durationMs, start, stop, reset } = useRecorder();
@@ -51,6 +70,8 @@ export function RecordScreen() {
     }
     await start();
   };
+
+  const recovery = recoveryFor(phase, reset);
 
   return (
     <View className="flex-1 bg-deep">
@@ -81,17 +102,13 @@ export function RecordScreen() {
                   {formatDuration(durationMs)}
                 </Text>
               ) : null}
-              <Text className="type-caption text-on-deep-faint">{hintFor(phase)}</Text>
+              <Text className="type-caption text-on-deep-faint">{HINTS[phase]}</Text>
             </View>
           </View>
 
-          {phase === 'denied' ? (
-            <Pressable className={RECOVER} onPress={() => Linking.openSettings()}>
-              <Text className="type-label text-on-deep">Open Settings</Text>
-            </Pressable>
-          ) : phase === 'tooShort' ? (
-            <Pressable className={RECOVER} onPress={reset}>
-              <Text className="type-label text-on-deep">Try again</Text>
+          {recovery ? (
+            <Pressable className={RECOVER} accessibilityRole="button" onPress={recovery.onPress}>
+              <Text className="type-label text-on-deep">{recovery.label}</Text>
             </Pressable>
           ) : (
             <View className="flex-row items-center justify-center gap-2 pb-8">
@@ -107,24 +124,16 @@ export function RecordScreen() {
   );
 }
 
-function hintFor(phase: string): string {
-  switch (phase) {
-    case 'recording':
-      return 'Tap to stop';
-    case 'processing':
-      return 'Listening back…';
-    case 'denied':
-      return 'Nook needs the microphone to hear you';
-    case 'tooShort':
-      return 'That was very short. Say a little more?';
-    default:
-      return 'Tap to start';
-  }
-}
-
 function LockIcon() {
   return (
-    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+    <Svg
+      width={14}
+      height={14}
+      viewBox="0 0 24 24"
+      fill="none"
+      accessibilityElementsHidden
+      importantForAccessibility="no"
+    >
       <Rect
         x={4}
         y={10.5}

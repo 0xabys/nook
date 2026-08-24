@@ -14,28 +14,22 @@ import { Motion } from '@/theme';
 import { useReducedMotion } from './use-reduced-motion';
 
 /**
- * Floor of the pulse; DESIGN.md `### Skeleton` specifies opacity 0.6 → 1.0 over
- * 1200ms. Reduced motion makes it SHALLOWER, not still — an opacity change does
- * not trigger vestibular symptoms, and killing it entirely would take away the
- * only signal that work is still in progress.
+ * Pulse floor: opacity 0.6 → 1.0 over 1200ms, per DESIGN.md `### Skeleton`.
+ * Reduced motion makes it shallower rather than still — opacity does not trigger
+ * vestibular symptoms, and stopping it removes the only "still working" signal.
  */
 const DIM = 0.6;
 const DIM_REDUCED = 0.85;
 
-/**
- * Phase offset per block, as a fraction of one cycle. A skeleton list holds ~21
- * blocks; 21 × 0.025 ≈ half a wave on screen at any moment — enough to read a
- * direction, not enough to look like stripes.
- */
+/** Phase offset per block, as a fraction of a cycle: ~half a wave over ~21 blocks. */
 export const PHASE_STEP = 0.025;
 
 /** Full cycle. `Motion.duration.pulse` is a HALF cycle. */
 const PERIOD = Motion.duration.pulse * 2;
 
 /**
- * Sawtooth clock 0 → 1, looping forever, LINEAR. Linear is required: all of the
- * curve lives in the cosine inside `usePulseStyle`, and easing here would bend
- * two out-of-phase blocks differently and warp the wave.
+ * Sawtooth clock 0 → 1, looping forever. Linear is required: the curve lives in
+ * the cosine in `usePulseStyle`, and easing here would warp out-of-phase blocks.
  */
 export function usePulseClock(active = true) {
   const clock = useSharedValue(0);
@@ -50,18 +44,15 @@ export function usePulseClock(active = true) {
         withTiming(1, {
           duration: PERIOD,
           easing: Easing.linear,
-          // `Never` is not an accessibility bypass. Under the `System` default
-          // Reanimated makes `withTiming` jump straight to the target, freezing
-          // the clock at 1 and locking opacity at 1.0. The concession is made in
-          // amplitude instead: `DIM` 0.6 becomes `DIM_REDUCED` 0.85.
+          // Not a bypass: under `System` the clock would freeze at 1 and lock
+          // opacity solid. The concession is made in amplitude, via `DIM_REDUCED`.
           reduceMotion: ReduceMotion.Never,
         }),
         -1,
         false,
         undefined,
-        // `withRepeat` carries its OWN `reduceMotion` flag, also defaulting to
-        // `System`. Setting it on the inner animation alone is not enough — the
-        // repeat wrapper still gets disabled and the clock runs exactly once.
+        // `withRepeat` carries its own flag; setting only the inner one leaves
+        // the wrapper disabled and the clock runs exactly once.
         ReduceMotion.Never,
       ),
     );

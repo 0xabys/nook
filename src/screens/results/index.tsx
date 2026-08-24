@@ -11,9 +11,9 @@ import { SkeletonCard } from '@/components/skeleton-card';
 import { SkeletonFade } from '@/components/skeleton-fade';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { Colors, Motion } from '@/theme';
-import { chromeTier } from '@/utils/chrome';
-import { ActivityIndicator, FlatList, ScrollView, Text, View } from '@/tw';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, View } from '@/tw';
 import { Animated } from '@/tw/animated';
+import { chromeTier } from '@/utils/chrome';
 
 import { ResultsHeader } from './components/results-header';
 
@@ -37,6 +37,7 @@ export function ResultsScreen({ disorderIds, disorderLabels }: Props) {
     totalSize,
     isLoading,
     isError,
+    isPageError,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -103,10 +104,19 @@ export function ResultsScreen({ disorderIds, disorderLabels }: Props) {
         }
         ItemSeparatorComponent={Separator}
         ListFooterComponent={
-          <Footer loading={isFetchingNextPage} done={!hasNextPage} count={providers.length} />
+          <Footer
+            loading={isFetchingNextPage}
+            failed={isPageError}
+            done={!hasNextPage}
+            count={providers.length}
+            onRetry={() => fetchNextPage()}
+          />
         }
         onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+          // `isPageError` stops the retry loop: `onEndReached` fires again as
+          // soon as the failed fetch settles, and without this the same request
+          // is hammered for as long as the user sits at the bottom.
+          if (hasNextPage && !isFetchingNextPage && !isPageError) fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
         showsVerticalScrollIndicator={false}
@@ -173,7 +183,15 @@ function Separator() {
   return <View className="h-3" />;
 }
 
-function Footer({ loading, done, count }: { loading: boolean; done: boolean; count: number }) {
+type FooterProps = {
+  loading: boolean;
+  failed: boolean;
+  done: boolean;
+  count: number;
+  onRetry: () => void;
+};
+
+function Footer({ loading, failed, done, count, onRetry }: FooterProps) {
   if (loading) {
     return (
       <View className="items-center py-6">
@@ -181,6 +199,27 @@ function Footer({ loading, done, count }: { loading: boolean; done: boolean; cou
       </View>
     );
   }
+
+  // A page after the first failed. The people already loaded stay on screen —
+  // replacing a working list with a full-screen error costs the user everything
+  // they were reading over one dropped request.
+  if (failed) {
+    return (
+      <View className="items-center gap-2 py-6">
+        <Text className="type-caption text-center text-ink-soft">
+          We could not load any more just now.
+        </Text>
+        <Pressable
+          onPress={onRetry}
+          accessibilityRole="button"
+          className="press min-h-11 justify-center rounded-full border border-line px-6"
+        >
+          <Text className="type-label text-ink">Try again</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   // Only claim the end when the list was long enough to have been scrolled.
   if (done && count > SKELETON_COUNT) {
     return (
@@ -191,5 +230,6 @@ function Footer({ loading, done, count }: { loading: boolean; done: boolean; cou
       </View>
     );
   }
+
   return <View className="h-6" />;
 }

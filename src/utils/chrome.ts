@@ -1,12 +1,8 @@
 import { Platform } from 'react-native';
 
-export type ChromeTier = 'ios26' | 'iosLegacy' | 'android';
+import { resolveChromeTier } from './chrome-tier';
 
-function detect(): ChromeTier {
-  if (Platform.OS !== 'ios') return 'android';
-  // Platform.Version is a string like "26.0" on iOS.
-  const major = Number.parseInt(String(Platform.Version), 10);
-  return Number.isFinite(major) && major >= 26 ? 'ios26' : 'iosLegacy';
-}
+export type { ChromeTier } from './chrome-tier';
 
-export const chromeTier = detect();
+/** Resolved once at import: `Platform` cannot change during a session. */
+export const chromeTier = resolveChromeTier(Platform.OS, Platform.Version);

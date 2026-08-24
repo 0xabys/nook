@@ -1,5 +1,3 @@
-import { Platform } from 'react-native';
-
 export const Palette = {
   primary100: '#f5fbf4',
   primary200: '#edf5eb',
@@ -147,52 +145,9 @@ export const Space = {
   giant: 64,
 } as const;
 
-export const Layout = {
-  screenPaddingH: Space.base,
-  screenPaddingTop: Space.xl,
-  cardPadding: Space.base,
-  listGap: Space.md,
-  sectionGap: Space.xxl,
-  minTouchTarget: 44,
-  avatarSize: 56,
-  recordButtonSize: 88,
-  maxContentWidth: 800,
-  bottomTabInset: Platform.select({ ios: 50, android: 80 }) ?? 0,
-} as const;
-
-export const Radius = {
-  xs: 6,
-  sm: 10,
-  /** Provider card. Measured off the mockup: 0.024 × card width. */
-  md: 12,
-  lg: 20,
-  xl: 28,
-  full: 999,
-} as const;
-
-export const Shadow = {
-  sm: {
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 18,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 7 },
-    shadowOpacity: 0.2,
-    shadowRadius: 18,
-    elevation: 8,
-  },
-} as const;
+// Radius, shadow and layout tokens live in `global.css` — they are only ever
+// consumed through `className`, so duplicating them here would be a second
+// source of truth with nothing reading it.
 
 export const Motion = {
   duration: {

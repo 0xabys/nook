@@ -14,15 +14,12 @@ const GROUPS: number[][] = [
 const CHIP = 'h-10 rounded-full border border-line bg-surface';
 
 /**
- * TOP PADDING: the skeleton block uses `pt-3` (`pt-2` on Android), 4pt LESS than
- * the chip block, because the status line replaces the first group heading and
- * `type-caption` is 18 tall against `type-overline`'s 14:
+ * Callers give this block `pt-3` against the chip block's `pt-4`: the status line
+ * replaces the first group heading and `type-caption` is 18 tall against
+ * `type-overline`'s 14, so both come to 42 and nothing shifts on handover.
  *
- *   chips    `pt-4`(16) + heading(14) + `gap-3`(12) = 42
- *   skeleton `pt-3`(12) + status(18)  + `gap-3`(12) = 42
- *
- * Do not "fix" it by forcing `h-3.5` onto the `Text`: RN clips the overflow and
- * the descender of "Listening back…" gets cut.
+ * Do not force `h-3.5` onto the `Text` instead — RN clips the descender of
+ * "Listening back…".
  */
 
 /**

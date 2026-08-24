@@ -15,29 +15,19 @@ type Props = {
 };
 
 /**
- * Wraps the bottom bar so it NEVER mounts or unmounts.
+ * Reveals the bottom bar without ever mounting or unmounting it, so rapid
+ * select/deselect reverses mid-flight instead of popping.
  *
- * `shown ? <Bar/> : null` is not a rough animation, it is no animation: React
- * attaches or detaches the node and RN paints it in one frame. Here the node
- * always lives and a single shared value runs 0 → 1, so rapid select/deselect
- * reverses mid-flight instead of queueing.
- *
- * The price is an invisible node in the tree. It is locked out of both touch
- * (`pointerEvents`) and accessibility — miss either and an invisible button
- * eats taps or shows up in the screen reader.
+ * The node always exists, so it must be locked out of both touch and
+ * accessibility while hidden — miss either and an invisible button eats taps.
  */
 export function BarReveal({ shown, distance, className, style, children }: Props) {
   const reduced = useReducedMotion();
   const progress = useSharedValue(shown ? 1 : 0);
 
   useEffect(() => {
-    // 180ms `withTiming` + strong ease-out, NOT `withSpring`. `Motion.spring` is
-    // critically damped (ζ≈0.93, ω≈11.8 rad/s): it needs ~410ms to reach 95% and
-    // starts from zero velocity, covering only ~15% in the first 100ms, which
-    // reads as "the button appeared a while after I tapped". A front-loaded curve
-    // is nearly at full opacity by 60ms.
-    //
-    // `.set()`/`.get()`, not `.value` — React Compiler is on.
+    // Front-loaded timing, not `Motion.spring`: the spring is critically damped
+    // and covers only ~15% in the first 100ms, which reads as a delayed button.
     progress.set(
       withTiming(shown ? 1 : 0, {
         duration: Motion.duration.fast,
