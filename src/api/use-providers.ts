@@ -4,8 +4,9 @@ import { useMemo } from 'react';
 import { FIRST_PAGE, PAGE_SIZE } from '@/constants';
 
 import { gqlClient } from './client';
+import { dedupeProviders, nextPageParam, totalSizeOf } from './pagination';
 import { SEARCH_PROVIDERS } from './queries';
-import type { Provider, ProvidersPage, SearchProvidersResponse } from './types';
+import type { ProvidersPage, SearchProvidersResponse } from './types';
 
 /**
  * Paginates SEARCH_PROVIDERS. Pages are 1-based: `pageNum: 0` makes the server
@@ -30,34 +31,19 @@ export function useProviders(disorderIds: string[]) {
       });
       return res.searchProviders.providers;
     },
-    getNextPageParam: (lastPage, _all, lastPageParam) =>
-      lastPage.canLoadMore ? lastPageParam + 1 : undefined,
+    getNextPageParam: (lastPage, _all, lastPageParam) => nextPageParam(lastPage, lastPageParam),
   });
 
-  const providers = useMemo(() => {
-    const pages = query.data?.pages ?? [];
-    // Page-number pagination, not cursors: if the result set shifts between
-    // fetches the same person can land on two pages. Dedupe by firebaseUid so
-    // the list never sees a duplicate key.
-    const seen = new Set<string>();
-    const out: Provider[] = [];
-    for (const page of pages) {
-      for (const p of page.providers ?? []) {
-        const id = p.userInfo?.firebaseUid;
-        if (!id || seen.has(id)) continue;
-        seen.add(id);
-        out.push(p);
-      }
-    }
-    return out;
-  }, [query.data]);
+  const providers = useMemo(() => dedupeProviders(query.data?.pages), [query.data]);
 
   return {
     providers,
-    /** From the FIRST page — later pages report 0. */
-    totalSize: query.data?.pages[0]?.totalSize ?? 0,
+    totalSize: totalSizeOf(query.data?.pages),
     isLoading: query.isPending,
-    isError: query.isError,
+    /** The FIRST page failed — there is nothing on screen to keep. */
+    isError: query.isError && providers.length === 0,
+    /** A load-more failed while earlier pages are still on screen. */
+    isPageError: query.isError && providers.length > 0,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
     fetchNextPage: query.fetchNextPage,
